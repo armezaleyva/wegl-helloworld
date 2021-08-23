@@ -10,10 +10,13 @@ const vertexShader = `#version 300 es
 precision mediump float;
 
 in vec2 position;
+in vec3 iColor;
+out vec3 oColor;
 
 void main()
 {
   gl_Position = vec4(position, 0, 1);
+  oColor = iColor;
 }
 `;
 
@@ -22,10 +25,11 @@ const fragmentShader = `#version 300 es
 precision mediump float;
 
 out vec4 fragColor;
+in vec3 oColor;
 
 void main()
 {
-  fragColor = vec4(1, 1, 1, 1);
+  fragColor = vec4(oColor, 1);
 }
 `;
 
@@ -63,6 +67,20 @@ const triangleCoords = [
     -0.2, -0.2,
     0.2, -0.2
 ];
+
+const vertexColorArray = [
+  1, 0, 0, // r
+  0, 1, 0, // g
+  0, 0, 1 // b
+];
+
+const vertexColorBuffer = gl.createBuffer();
+gl.bindBuffer(gl.ARRAY_BUFFER, vertexColorBuffer);
+gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(vertexColorArray), gl.STATIC_DRAW);
+const attribVertexColor = gl.getAttribLocation(program, 'iColor');
+gl.enableVertexAttribArray(attribVertexColor);
+gl.vertexAttribPointer(attribVertexColor, 3, gl.FLOAT, gl.FALSE, 0, 0);
+
 
 // Reservamos memoria en la tarjeta de video en la vram
 const positionBuffer = gl.createBuffer();
