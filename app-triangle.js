@@ -90,22 +90,52 @@ const vertexColorArray = [
 const vertexColorBuffer = gl.createBuffer();
 const positionBuffer = gl.createBuffer();
 
-const now = Date.now();
+let now = Date.now();
 
 const uniformTime = gl.getUniformLocation(program, 'iTime');
 const uModelMatrix = gl.getUniformLocation(program, 'modelMatrix');
 
 const modelMatrix = mat4.create();
 
-const update = () => {
-  const deltaTime = Date.now() - now;
-  //console.log(deltaTime);
+const axis = {
+  x: 0,
+  y: 0
+};
 
-  mat4.rotate(
+const ArrowKeys = () => {
+  addEventListener('keydown', ({key}) => {
+    //console.log(key);
+    axis.x = key === 'a' ? -1 : key === 'd' ? 1 : 0;
+    axis.y = key === 's' ? -1 : key === 'w' ? 1 : 0;
+    //console.log(axis);
+  });
+
+  addEventListener('keyup', ({key}) => {
+    //console.log(key);
+    axis.x = (key === 'a' || key === 'd') ? 0 : axis.x;
+    axis.y = (key === 's' || key === 'w') ? 0 : axis.y;
+    //console.log(axis);
+  });
+};
+
+ArrowKeys();
+
+const update = () => {
+  const deltaTime = (Date.now() - now) / 1000;
+  now = Date.now();
+  //console.log(deltaTime / 1000);
+
+  // mat4.rotate(
+  //   modelMatrix,
+  //   modelMatrix,
+  //   deltaTime / 1000,
+  //   [0, 0, 0.2]
+  // );
+
+  mat4.translate(
     modelMatrix,
     modelMatrix,
-    deltaTime * 5.0,
-    [0, 0, 1]
+    [axis.x * deltaTime, axis.y * deltaTime, 0]
   );
 
   // Clear screen
@@ -139,6 +169,6 @@ const update = () => {
 
   gl.drawArrays(gl.TRIANGLES, 0, 6);
   requestAnimationFrame(update);
-}
+};
 
 requestAnimationFrame(update);
